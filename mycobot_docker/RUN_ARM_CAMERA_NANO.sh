@@ -22,9 +22,14 @@ detect_nano_ip() {
   fi
 }
 
-NANO_USER="er"
+SCRIPT_DIR_ENV="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+for _env_file in "${SCRIPT_DIR_ENV}/../../future_lab_control_center/.env" "${SCRIPT_DIR_ENV}/../../.env" "${SCRIPT_DIR_ENV}/../.env"; do
+  if [ -f "$_env_file" ]; then set -a; source "$_env_file"; set +a; break; fi
+done
+
+NANO_USER="${JETSON_NANO_SSH_USER:-er}"
 NANO_IP=$(detect_nano_ip)
-NANO_PASS="Elephant"
+NANO_PASS="${JETSON_NANO_SSH_PASSWORD:?Defina JETSON_NANO_SSH_PASSWORD no .env}"
 
 echo "========================================"
 echo "  Câmera do Braço — Nano → PC"
@@ -69,9 +74,9 @@ if [ "${CAM_OK:-0}" -gt 0 ]; then
   echo "    ./mycobot_docker/RUN_VISUAL_SERVO.sh"
   echo ""
   echo "  Ver log câmera:"
-  echo "    sshpass -p Elephant ssh er@192.168.0.250 'tail -f /tmp/arm_camera.log'"
+  echo "    ssh ${NANO_USER}@192.168.0.250 'tail -f /tmp/arm_camera.log'"
 else
   echo ""
   echo "  FALHOU — verifique:"
-  echo "    sshpass -p Elephant ssh er@192.168.0.250 'cat /tmp/arm_camera.log'"
+  echo "    ssh ${NANO_USER}@192.168.0.250 'cat /tmp/arm_camera.log'"
 fi

@@ -19,9 +19,14 @@ detect_nano_ip() {
   fi
 }
 
-NANO_USER="er"
+SCRIPT_DIR_ENV="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+for _env_file in "${SCRIPT_DIR_ENV}/../../future_lab_control_center/.env" "${SCRIPT_DIR_ENV}/../../.env" "${SCRIPT_DIR_ENV}/../.env"; do
+  if [ -f "$_env_file" ]; then set -a; source "$_env_file"; set +a; break; fi
+done
+
+NANO_USER="${JETSON_NANO_SSH_USER:-er}"
 NANO_IP=$(detect_nano_ip)
-NANO_PASS="Elephant"
+NANO_PASS="${JETSON_NANO_SSH_PASSWORD:?Defina JETSON_NANO_SSH_PASSWORD no .env}"
 SRC_DIR="$(dirname "$0")/custom_ws/src/mycobot_hw_interface"
 PC_IP="$(ip route get "$NANO_IP" 2>/dev/null | awk '{for (i=1; i<=NF; i++) if ($i == "src") print $(i+1)}' | head -1)"
 if [ -z "$PC_IP" ]; then
@@ -86,7 +91,7 @@ sshpass -p "$NANO_PASS" ssh -o StrictHostKeyChecking=no ${NANO_USER}@${NANO_IP} 
   cat > ~/start_bridge.sh <<'"'"'EOS'"'"'
 #!/bin/bash
 # Limpeza segura: APENAS mata processos do bridge, nada genérico.
-echo "Elephant" | sudo -S fuser -k /dev/ttyTHS1 2>/dev/null || true
+fuser -k /dev/ttyTHS1 2>/dev/null || true
 pkill -9 -x mycobot_bridge 2>/dev/null || true
 sleep 1
 
@@ -117,6 +122,6 @@ if [ "$ALIVE" -gt 0 ]; then
   echo "  ✓ Bridge OK — código atualizado e rodando"
 else
   echo ""
-  echo "  ✗ Bridge FAILED — checa: sshpass -p Elephant ssh er@${NANO_IP} 'cat /tmp/bridge.log'"
+  echo "  ✗ Bridge FAILED — checa: ssh ${NANO_USER}@${NANO_IP} 'cat /tmp/bridge.log'"
   exit 1
 fi

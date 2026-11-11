@@ -7,10 +7,15 @@
 # existente sem o matar (não interfere com o planning).
 # ============================================================
 
+SCRIPT_DIR_ENV="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+for _env_file in "${SCRIPT_DIR_ENV}/../../future_lab_control_center/.env" "${SCRIPT_DIR_ENV}/../../.env" "${SCRIPT_DIR_ENV}/../.env"; do
+  if [ -f "$_env_file" ]; then set -a; source "$_env_file"; set +a; break; fi
+done
+
 CYCLONE_XML="/root/custom_ws/cyclonedds_pc.xml"
-NANO_USER="er"
-NANO_IP="192.168.0.250"
-NANO_PASS="Elephant"
+NANO_USER="${JETSON_NANO_SSH_USER:-er}"
+NANO_IP="${JETSON_NANO_IP:-192.168.0.250}"
+NANO_PASS="${JETSON_NANO_SSH_PASSWORD:?Defina JETSON_NANO_SSH_PASSWORD no .env}"
 BRIDGE_STARTED_HERE=0   # 1 se este script arrancou o bridge
 
 # ── Cleanup — corre ao Ctrl+C ou exit ────────────────────────────────
@@ -96,7 +101,7 @@ else
     echo "  Bridge OK"
     BRIDGE_STARTED_HERE=1
   else
-    echo "  AVISO: bridge não arrancou — sshpass -p Elephant ssh er@192.168.0.250 'cat /tmp/bridge.log'"
+    echo "  AVISO: bridge não arrancou — ssh ${NANO_USER}@${NANO_IP} 'cat /tmp/bridge.log'"
   fi
 fi
 

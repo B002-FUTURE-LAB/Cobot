@@ -26,11 +26,15 @@ detect_nano_ip() {
   fi
 }
 
-NANO_USER="er"
-NANO_IP=$(detect_nano_ip)
-NANO_PASS="Elephant"
-PORT=8080
 DIR="$(cd "$(dirname "$0")" && pwd)"
+for _env_file in "${DIR}/../../future_lab_control_center/.env" "${DIR}/../../.env" "${DIR}/../.env"; do
+  if [ -f "$_env_file" ]; then set -a; source "$_env_file"; set +a; break; fi
+done
+
+NANO_USER="${JETSON_NANO_SSH_USER:-er}"
+NANO_IP=$(detect_nano_ip)
+NANO_PASS="${JETSON_NANO_SSH_PASSWORD:?Defina JETSON_NANO_SSH_PASSWORD no .env}"
+PORT=8080
 
 SSH="sshpass -p $NANO_PASS ssh -o StrictHostKeyChecking=no ${NANO_USER}@${NANO_IP}"
 

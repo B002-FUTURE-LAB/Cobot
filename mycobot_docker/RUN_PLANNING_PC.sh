@@ -19,14 +19,18 @@ detect_nano_ip() {
   fi
 }
 
-NANO_USER="er"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+for _env_file in "${SCRIPT_DIR}/../../future_lab_control_center/.env" "${SCRIPT_DIR}/../../.env" "${SCRIPT_DIR}/../.env"; do
+  if [ -f "$_env_file" ]; then set -a; source "$_env_file"; set +a; break; fi
+done
+
+NANO_USER="${JETSON_NANO_SSH_USER:-er}"
 NANO_IP=$(detect_nano_ip)
-NANO_PASS="Elephant"
+NANO_PASS="${JETSON_NANO_SSH_PASSWORD:?Defina JETSON_NANO_SSH_PASSWORD no .env}"
 
 echo "========================================"
 echo "  [1/4] Garantindo contêiner Docker rodando"
 echo "========================================"
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if docker inspect mycobot_ros2 >/dev/null 2>&1; then
   # O backend monta apenas o socket e o cliente Docker; nesse ambiente o
   # plugin `docker compose` pode não existir, mas o contêiner já criado existe.
@@ -51,7 +55,7 @@ echo "========================================"
 echo "  [2/4] Reiniciando bridge e câmera no Nano (${NANO_IP})"
 echo "========================================"
 timeout 10 sshpass -p "$NANO_PASS" ssh -o StrictHostKeyChecking=no -o ConnectTimeout=8 ${NANO_USER}@${NANO_IP} \
-  'echo Elephant | sudo -S fuser -k /dev/ttyTHS1 2>/dev/null; pkill -9 -f mycobot_bridge 2>/dev/null; truncate -s 0 /tmp/bridge.log' \
+  "echo \"$NANO_PASS\" | sudo -S fuser -k /dev/ttyTHS1 2>/dev/null; pkill -9 -f mycobot_bridge 2>/dev/null; truncate -s 0 /tmp/bridge.log" \
   2>/dev/null || true
 
 sleep 2
@@ -74,7 +78,7 @@ BRIDGE_OK=${BRIDGE_OK:-0}
 if [ "${BRIDGE_OK}" -gt 0 ]; then
   echo "  Bridge OK (mycobot_bridge rodando no Nano em ${NANO_IP})"
 else
-  echo "  Bridge FAILED — verifique: sshpass -p Elephant ssh er@${NANO_IP} 'cat /tmp/bridge.log'"
+  echo "  Bridge FAILED — verifique: ssh ${NANO_USER}@${NANO_IP} 'cat /tmp/bridge.log'"
   exit 1
 fi
 

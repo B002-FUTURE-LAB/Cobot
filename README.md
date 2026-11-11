@@ -27,7 +27,7 @@ Distributed setup for controlling a **MyCobot 280 Jetson Nano (JN)** with **Move
 ### Prerequisites
 - Docker and Docker Compose on the PC
 - `sshpass` installed on the PC: `sudo apt install sshpass`
-- Jetson Nano reachable on the LAN with user `er` / password `Elephant`
+- Jetson Nano reachable on the LAN with credentials configured in `future_lab_control_center/.env` (`JETSON_NANO_SSH_USER` / `JETSON_NANO_SSH_PASSWORD`)
 - Bridge installed on the Nano in `~/custom_ws` (see "Initial Nano Setup" below)
 
 ### Standard Usage — Single Command
