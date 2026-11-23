@@ -68,6 +68,19 @@ docker exec mycobot_ros2 bash -c "source /opt/ros/galactic/setup.bash && cd /roo
 
 ---
 
+## Simulation Without the Robot
+
+```bash
+./mycobot_docker/RUN_MOCK_PC.sh
+```
+
+Runs `mycobot_bridge` with `mock:=true` inside the container, so MoveIt and
+RViz work with no Jetson Nano. On an ARM64 host (for example a VM on Apple
+Silicon), build the image with `BASE_IMAGE=ros:galactic docker compose build`
+because `osrf/ros:galactic-desktop` is x86_64 only.
+
+---
+
 ## Architecture
 
 ### Data Flow
