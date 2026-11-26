@@ -1,5 +1,7 @@
 import os
 from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from launch.substitutions import Command, FindExecutable
 from launch_ros.parameter_descriptions import ParameterValue
@@ -51,7 +53,17 @@ def generate_launch_description():
         "trajectory_execution.allowed_start_tolerance": 0.05,
     }
 
+    # Other packages (e.g. drawer_picking) can pass their own RViz config;
+    # the default is still config/moveit.rviz.
+    rviz_config = LaunchConfiguration("rviz_config")
+
     return LaunchDescription([
+        DeclareLaunchArgument(
+            "rviz_config",
+            default_value=os.path.join(get_package_share_directory(config_pkg), "config/moveit.rviz"),
+            description="RViz config file",
+        ),
+
         # Re-carimba timestamps do Nano com clock local do PC
         # (evita que MoveIt rejeite estados como "stale")
         Node(
@@ -94,8 +106,7 @@ def generate_launch_description():
         Node(
             package="rviz2",
             executable="rviz2",
-            arguments=["-d", os.path.join(
-                get_package_share_directory(config_pkg), "config/moveit.rviz")],
+            arguments=["-d", rviz_config],
             parameters=[
                 robot_description,
                 robot_description_semantic,

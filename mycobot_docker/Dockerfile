@@ -1,4 +1,7 @@
-FROM osrf/ros:galactic-desktop
+# osrf/ros:galactic-desktop is x86_64 only. On ARM64 (e.g. a VM on Apple Silicon) use:
+#   BASE_IMAGE=ros:galactic docker compose build
+ARG BASE_IMAGE=osrf/ros:galactic-desktop
+FROM ${BASE_IMAGE}
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -16,6 +19,7 @@ RUN apt-get update && apt-get install -y \
     ros-galactic-moveit \
     ros-galactic-moveit-setup-assistant \
     ros-galactic-backward-ros \
+    ros-galactic-rmw-fastrtps-cpp \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install pymycobot --upgrade

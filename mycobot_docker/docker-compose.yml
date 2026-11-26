@@ -3,6 +3,8 @@ services:
     build:
       context: .
       network: host
+      args:
+        BASE_IMAGE: ${BASE_IMAGE:-osrf/ros:galactic-desktop}
     container_name: mycobot_ros2
     network_mode: "host"
     privileged: true

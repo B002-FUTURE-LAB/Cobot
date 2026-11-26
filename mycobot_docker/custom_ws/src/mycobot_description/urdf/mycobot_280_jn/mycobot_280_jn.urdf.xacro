@@ -119,15 +119,16 @@
     <origin xyz="0 0 0.01" rpy="-1.579 0 0"/>
   </joint>
 
-  <!-- TCP na face do copo de sucção.
-       Mesh (mm): anel Ø20 em (0, 11.66, -14.45) olhando -z do mesh.
-       Com a origem visual oficial (0, 0.008, 0.009, rpy 1.5708 0 0),
-       o copo fica em (0, 0.02245, 0.02066) no frame pump_head, sucção
-       para +y_ph. rpy=(-pi/2,0,0) põe o z do TCP saindo do copo —
-       no link6 isso é +y (FK verificado: copo em (0, 0.0125, 0.0306)). -->
+  <!-- TCP na face do copo de sucção, z saindo do copo.
+       Mesh pump_head.dae (com as transformações dos nós COLLADA e a
+       origem visual acima): o copo é o cilindro Ø15 na ponta da peça,
+       centrado em (0, 8, *) mm e terminando em z = 96.2 mm do frame
+       pump_head, coaxial com o flange (eixo da junta 6). O anel Ø20 com
+       4 furos na face +y é a placa de fixação, não o copo (TCP antigo,
+       que fazia as retas andarem de lado, ao longo do y do link6). -->
   <joint name="pump_head_to_tcp" type="fixed">
     <parent link="pump_head"/><child link="pump_tcp"/>
-    <origin xyz="0 0.02245 0.02066" rpy="-1.5708 0 0"/>
+    <origin xyz="0 0.008 0.0962" rpy="0 0 0"/>
   </joint>
 
   <!-- Frame óptico da câmera (convenção ROS: z sai da lente).
